@@ -1,0 +1,19 @@
+[project]
+name = "pythonfastapi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aerich>=0.9.2",
+    "aiofiles>=25.1.0",
+    "asyncpg>=0.31.0",
+    "fastapi[standard]>=0.124.0",
+    "tomlkit>=0.13.3",
+    "tortoise-orm>=0.25.1",
+]
+
+[tool.aerich]
+tortoise_orm = "main.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."

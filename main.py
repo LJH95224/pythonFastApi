@@ -1,14 +1,9 @@
-'''
-Description: ORM 对象关系映射
-Date: 2025-12-08 13:21:00
-FilePath: \pythonFastApi\main.py
-'''
 from typing import TypeVar, Generic, Union, List, Optional
 from fastapi import FastAPI, Request, Query
 from pydantic import BaseModel
-from fastapi.responses import Response, FileResponse, StreamingResponse, HTMLResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
+from model19 import Student
+from createStudent import create_student, update_student, delete_student, get_student, get_filtered_students
 
 app = FastAPI()
 
@@ -76,3 +71,67 @@ register_tortoise(
 # 应用数据库迁移
 # aerich upgrade
 """
+
+# 定义范型
+T = TypeVar('T')
+
+class SuccessResponse(BaseModel, Generic[T]):
+    status: str = 'success'
+    data: T
+
+
+class ErrorResponse(BaseModel):
+    status: str = 'error'
+    message: str
+    code: int = 500
+
+
+
+@app.post('/create_student')
+async def create_new_student(name: str, email: str, age: int = 0):
+    """
+    创建学生
+    """
+    stu = await create_student(name, email, age)
+    return stu
+    # try:
+    #     stu = await create_student(name, email, age)
+    #     if stu:
+    #         return SuccessResponse(data=stu)
+    #     else:
+    #         return ErrorResponse(message="创建学生失败")
+    # except Exception as e:
+    #     return ErrorResponse(message=str(e))
+
+
+@app.post('/update_student')
+async def update_existing_student(stu_id: int, name: str = None, email: str = None, age: int = None):
+    """
+    更新学生
+    """
+    stu = await update_student(stu_id, name, email, age)
+    return stu
+
+@app.post('/delete_student')
+async def delete_existing_student(stu_id: int):
+    """
+    删除学生
+    """
+    is_deleted = await delete_student(stu_id)
+    return is_deleted
+
+@app.post('/get_student')
+async def get_existing_student(stu_id: int):
+    """
+    查询学生单条数据
+    """
+    stu = await get_student(stu_id)
+    return stu
+
+@app.post('/get_filtered_students')
+async def get_age_filtered_students(age: int = 18):
+    """
+    查询所有学生 过滤 年龄大于指定年龄的学生
+    """
+    stu_list = await get_filtered_students(age)
+    return stu_list
